@@ -1,0 +1,266 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #3385FF;
+  --color-secondary: #29665B;
+  --color-accent: #E5594F;
+  --color-surface: #FFFDF7;
+  --color-base: #F8F2E2;
+  --color-blueprint: #E8F4FD;
+  --color-success: #4CAF50;
+  --color-warning: #FFC107;
+  --color-error: #F44336;
+  --color-locked: #9E9E9E;
+  --font-sans: 'Google Sans', 'OPPOSans', 'OPPO Sans', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --shadow-card-hover: 3px 3px 0px #1A1A1A;
+  --shadow-agent: 0 0 0 3px #3385FF, 0 0 12px rgba(51,133,255,0.35);
+  --shadow-tm: 0 0 0 3px #9C27B0, 0 0 16px rgba(156,39,176,0.4);
+  --shadow-modal: 6px 6px 0px rgba(26,26,26,0.15);
+}
+
+@font-face {
+  font-family: 'Google Sans';
+  src: url('/fonts/GoogleSans.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-007F, U+0080-00FF, U+0100-024F, U+0250-02AF;
+}
+
+@font-face {
+  font-family: 'OPPOSans';
+  src: url('/fonts/OPPOSans.woff2') format('woff2');
+  font-weight: 100 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    /* === 品牌色 === */
+    --color-primary: #3385FF;
+    --color-secondary: #29665B;
+    --color-accent: #E5594F;
+
+    /* === 背景色 === */
+    --bg-base: #F8F2E2;
+    --bg-surface: #FFFDF7;
+    --bg-blueprint: #E8F4FD;
+    --bg-overlay: rgba(34, 34, 34, 0.55);
+
+    /* === 组件色 === */
+    --comp-brief: #3385FF;
+    --comp-style: #C760A8;
+    --comp-req: #4CAF50;
+    --comp-agent: #ED6D57;
+    --comp-skill: #F2C84B;
+    --comp-rule: #29665B;
+    --comp-flow: #9C27B0;
+    --comp-plug: #00BCD4;
+    --comp-library: #795548;
+
+    /* === 语义状态色 === */
+    --color-success: #4CAF50;
+    --color-warning: #FFC107;
+    --color-error: #F44336;
+    --color-active: #3385FF;
+    --color-locked: #9E9E9E;
+    --color-tm: #9C27B0;
+
+    /* === 中性色 === */
+    --text-primary: #1A1A1A;
+    --text-secondary: #5A5A5A;
+    --text-placeholder: #AAAAAA;
+    --text-disabled: #CCCCCC;
+    --color-divider: #E8E2D4;
+
+    /* === 字体 === */
+    --font-family: 'Google Sans', 'OPPOSans', 'OPPO Sans', 'PingFang SC',
+                   'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+
+    /* === 字号 === */
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-md: 1.125rem;
+    --text-lg: 1.25rem;
+    --text-xl: 1.5rem;
+    --text-2xl: 2rem;
+    --text-3xl: 2.5rem;
+
+    /* === 间距 === */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-16: 64px;
+    --space-20: 80px;
+
+    /* === 圆角 === */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-2xl: 24px;
+    --radius-full: 9999px;
+
+    /* === 阴影 === */
+    --shadow-card-hover: 3px 3px 0px #1A1A1A;
+    --shadow-card-hover-generic: 3px 3px 0px #1A1A1A;
+    --shadow-agent-active: 0 0 0 3px #3385FF, 0 0 12px rgba(51,133,255,0.35);
+    --shadow-tm: 0 0 0 3px #9C27B0, 0 0 16px rgba(156,39,176,0.4);
+    --shadow-modal: 6px 6px 0px rgba(26,26,26,0.15);
+
+    /* === 缓动 === */
+    --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-enter: cubic-bezier(0, 0, 0.2, 1);
+    --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+    --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* === 时长 === */
+    --dur-instant: 80ms;
+    --dur-fast: 150ms;
+    --dur-standard: 250ms;
+    --dur-slow: 400ms;
+    --dur-story: 600ms;
+
+    /* === 断点 === */
+    --bp-desktop: 1024px;
+    --bp-wide: 1280px;
+    --bp-ultrawide: 1440px;
+
+    /* === 布局 === */
+    --sidebar-width: 200px;
+    --topbar-height: 48px;
+    --bottombar-height: 48px;
+    --agent-col-ratio: 65%;
+    --mirror-col-ratio: 35%;
+
+    /* === 建筑降饱和配色 === */
+    --building-l1-roof: #5A9BD5;
+    --building-l1-wall: #E8946A;
+    --building-l2-roof: #4A9E8F;
+    --building-l2-wall: #F5D76E;
+    --building-l3-roof: #E8946A;
+    --building-l3-wall: #E89FB0;
+    --building-l4-roof: #4A9E8F;
+    --building-l4-wall: #C5DFF5;
+    --building-locked: #C5C5C5;
+
+    /* === shadcn/ui CSS Variables === */
+    --background: var(--bg-base);
+    --foreground: var(--text-primary);
+    --card: var(--bg-surface);
+    --card-foreground: var(--text-primary);
+    --popover: var(--bg-surface);
+    --popover-foreground: var(--text-primary);
+    --primary: var(--color-primary);
+    --primary-foreground: #FFFDF7;
+    --secondary: var(--color-secondary);
+    --secondary-foreground: #FFFDF7;
+    --muted: #E8E2D4;
+    --muted-foreground: var(--text-secondary);
+    --accent: var(--color-accent);
+    --accent-foreground: #FFFDF7;
+    --destructive: var(--color-error);
+    --destructive-foreground: #FFFDF7;
+    --border: var(--color-divider);
+    --input: var(--color-divider);
+    --ring: var(--color-primary);
+    --radius: 8px;
+  }
+
+  * {
+    border-color: var(--border);
+  }
+
+  /* Building card hover animation */
+  .building-card {
+    transition: transform var(--dur-standard) var(--ease-standard);
+  }
+  .building-card[data-clickable="true"]:hover {
+    transform: translateY(-4px);
+  }
+  .building-card[data-clickable="true"]:hover .building-img {
+    filter: drop-shadow(3px 3px 0px #1A1A1A) !important;
+  }
+
+  body {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: 'Google Sans', 'OPPOSans', 'OPPO Sans', 'PingFang SC',
+      'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Workspace animations */
+  @keyframes pulse-ring {
+    0% { box-shadow: 0 0 0 0 rgba(51,133,255,0.4); }
+    70% { box-shadow: 0 0 0 8px rgba(51,133,255,0); }
+    100% { box-shadow: 0 0 0 0 rgba(51,133,255,0); }
+  }
+  .animate-pulse-ring {
+    animation: pulse-ring 2s infinite;
+  }
+
+  @keyframes bounce-in {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.05); }
+    70% { transform: scale(0.9); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .animate-bounce-in {
+    animation: bounce-in 0.5s var(--ease-bounce);
+  }
+
+  /* Component card hover */
+  .comp-card {
+    transition: transform var(--dur-fast) var(--ease-standard),
+                box-shadow var(--dur-fast) var(--ease-standard);
+  }
+  .comp-card:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Agent card status animations */
+  @keyframes agent-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-4px); }
+    40%, 80% { transform: translateX(4px); }
+  }
+
+  @keyframes tm-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 203, 203, 0.6); }
+    70% { box-shadow: 0 0 0 8px rgba(255, 203, 203, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 203, 203, 0); }
+  }
+
+  /* Confetti animations */
+  @keyframes fall {
+    0% { transform: translateY(-10vh); opacity: 0; }
+    5% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { transform: translateY(110vh); opacity: 0; }
+  }
+
+  @keyframes sway {
+    0% { transform: translateX(-40px) rotate(-180deg); }
+    100% { transform: translateX(40px) rotate(180deg); }
+  }
+}

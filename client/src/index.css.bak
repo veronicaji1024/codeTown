@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'OPPOSans';
+  src: url('/fonts/OPPOSans-R.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'OPPOSans';
+  src: url('/fonts/OPPOSans-M.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'OPPOSans';
+  src: url('/fonts/OPPOSans-M.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'OPPOSans';
+  src: url('/fonts/OPPOSans-B.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'OPPOSans';
+  src: url('/fonts/OPPOSans-H.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    /* ── Brand Colors ── */
+    --color-primary: #3385ff;
+    --color-secondary: #29665b;
+    --color-accent: #e5594f;
+
+    /* ── Backgrounds ── */
+    --bg-base: #f8f2e2;
+    --bg-surface: #fffdf7;
+    --bg-blueprint: #e8f4fd;
+    --bg-overlay: rgba(34, 34, 34, 0.55);
+
+    /* ── Component Accent Colors ── */
+    --comp-brief: #3385ff;
+    --comp-style: #c760a8;
+    --comp-req: #4caf50;
+    --comp-agent: #ed6d57;
+    --comp-skill: #f2c84b;
+    --comp-rule: #29665b;
+    --comp-flow: #9c27b0;
+    --comp-plug: #00bcd4;
+    --comp-library: #795548;
+
+    /* ── Semantic Status ── */
+    --color-success: #4caf50;
+    --color-warning: #ffc107;
+    --color-error: #f44336;
+    --color-active: #3385ff;
+    --color-locked: #9e9e9e;
+    --color-tm: #9c27b0;
+
+    /* ── Text ── */
+    --text-primary: #1a1a1a;
+    --text-secondary: #5a5a5a;
+    --text-placeholder: #aaaaaa;
+    --text-disabled: #cccccc;
+    --color-divider: #e8e2d4;
+
+    /* ── shadcn/ui CSS Variables ── */
+    --background: var(--bg-base);
+    --foreground: var(--text-primary);
+    --card: var(--bg-surface);
+    --card-foreground: var(--text-primary);
+    --popover: var(--bg-surface);
+    --popover-foreground: var(--text-primary);
+    --primary: var(--color-primary);
+    --primary-foreground: #fffdf7;
+    --secondary: var(--color-secondary);
+    --secondary-foreground: #fffdf7;
+    --muted: #e8e2d4;
+    --muted-foreground: var(--text-secondary);
+    --accent: var(--color-accent);
+    --accent-foreground: #fffdf7;
+    --destructive: var(--color-error);
+    --destructive-foreground: #fffdf7;
+    --border: var(--color-divider);
+    --input: var(--color-divider);
+    --ring: var(--color-primary);
+    --radius: 8px;
+  }
+
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: 'OPPOSans', 'OPPO Sans', 'PingFang SC', 'Hiragino Sans GB',
+      'Microsoft YaHei', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}

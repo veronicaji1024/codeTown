@@ -1,0 +1,316 @@
+# CodeTown — 构建进度追踪
+
+项目路径：/Users/veronicaji/Downloads/小程序/codeTown-2版/
+最后更新：2026-03-16
+
+---
+
+## 重要约定（新对话必读）
+
+- 每个 Phase 完成后必须 @momus 审查代码（Phase 3 SQL 层豁免）
+- 审查结果与用户讨论后再进入下一 Phase
+- 如上下文接近上限，必须提醒用户
+- 音效功能已移除，不添加任何音频相关代码
+- lucide-react 保留在 shadcn 生成组件内部，业务 UI 只用 @phosphor-icons/react
+
+---
+
+## Supabase 信息
+
+URL: https://orfdkvinlovtigkaueym.supabase.co
+密钥已写入 .env（不提交）
+
+---
+
+## 整体进度（15 Phases）
+
+[✅] Phase 1  — Monorepo 初始化与环境搭建
+[✅] Phase 2  — 共享类型层 (shared/)
+[✅] Phase 3  — 数据库初始化 (Supabase SQL)
+[✅] Phase 4  — 前端基础设施
+[✅] Phase 5  — 前端：认证流程
+[✅] Phase 6  — 前端：小镇地图视图
+[ ] Phase 7  — 前端：设计桌 (Workspace)
+[ ] Phase 8  — 前端：工地视图 (Construction)
+[ ] Phase 9  — 前端：WebSocket 客户端
+[✅] Phase 10 — 后端基础设施
+[✅] Phase 11 — 后端：AI 服务层
+[ ] Phase 12 — 后端：WebSocket 服务
+[ ] Phase 13 — 后端：Plug 与魔法连接
+[ ] Phase 14 — 后端：其余 REST API 路由
+[ ] Phase 15 — 集成联调与部署
+
+---
+
+## Phase 1 详细进度（✅ 全部完成）
+
+审查：CodeX 外部审查通过（2026-03-14，@momus 服务 502 不可用）
+
+- Step 1.1 ✅ 根目录配置文件：.nvmrc, .npmrc, package.json, .gitignore, .env.example, .env, .prettierrc
+- Step 1.2 ✅ npm install 完成
+- Step 1.3 ✅ 目录结构创建（client/server/shared 全部子目录）
+- Step 1.4 ✅ 全量依赖安装：react@19, tailwindcss@4.2.1（从 4.0.6 升级修 vite build bug）, express@5.0.1, @anthropic-ai/sdk@0.37.0
+- Step 1.5 ✅ shadcn/ui 初始化：components.json 手动创建，10 个组件，index.css + utils.ts
+- Step 1.6 ✅ CodeX 审查修复：stub 入口文件（main.tsx, App.tsx, shared/index.ts, server/index.ts），构建验证 vite build ✓
+
+---
+
+## Phase 2 详细进度（✅ 全部完成）
+
+审查：CodeX 审查通过（2026-03-15）
+
+- Step 2.1 ✅ shared/src/types.ts：15 个类型/接口（WsServerMessage、WsClientMessage、ProjectSpec 等）
+- Step 2.2 ✅ shared/src/index.ts：export * from './types'
+- Step 2.3 ✅ shared/tsconfig.json：tsc --noEmit 零错误
+
+---
+
+## Phase 3 详细进度（✅ 全部完成）
+
+审查：SQL 层豁免
+
+- Step 3.1 ✅ supabase/schema.sql：6 张表按顺序建表（trigger fn → users → projects → drafts → skills → rules → library_refs → indexes → RLS → policies）
+- Step 3.2 ✅ supabase/seed.sql：5 条内置技能 + 3 条内置规则（幂等，DELETE 后 INSERT）
+- Step 3.3 ✅ Supabase SQL Editor 执行完成：builtin_skills=5，builtin_rules=3，RLS 生效
+- Step 3.4 ✅ Storage bucket 创建：library-uploads（私有，500KB 限制）
+
+---
+
+## 用户决策记录
+
+- 音效移除：不引入 Howler.js，BGM/音效全部跳过
+- tailwindcss 锁定 4.2.1（4.0.6 有 vite build bug）
+- lucide-react 保留在 shadcn 组件内部，业务 UI 不使用
+- Supabase 使用新版 key 格式（sb_publishable_ / sb_secret_）
+- Phase 3 SQL 层跳过 @momus 审查
+
+---
+
+## Phase 4 详细进度（✅ 全部完成）
+
+审查：待 @momus 审查
+
+- Step 4.1 ✅ 字体转换：OPPO Sans 4.0.ttf → OPPOSans.woff2（变体字体 wght 100-700，13MB）
+- Step 4.2 ✅ 字体转换：Google Sans VariableFont.ttf → GoogleSans.woff2（变体字体 wght 400-700，1.4MB）
+- Step 4.3 ✅ index.css @theme 块：注册 Tailwind v4 自定义令牌（颜色、圆角、阴影、字体）
+- Step 4.4 ✅ index.css @font-face：Google Sans（英文，unicode-range 限定拉丁）+ OPPOSans（中文回退），均为 woff2 变体字体
+- Step 4.5 ✅ index.css :root 变量补全：字号(8个)、间距(11个)、圆角(6个)、阴影(5个)、缓动(4个)、时长(5个)、断点(3个)、布局(5个)、建筑色(9个)
+- Step 4.6 ✅ vite.config.ts：添加 @codetown/shared 路径别名
+- Step 4.7 ✅ FRONTEND_GUIDELINES 铁律表新增第 6 条「禁用 Emoji，统一使用 Phosphor Icons」
+- 验证 ✅ npm run dev 正常启动，背景色 #F8F2E2、字体 Google Sans + OPPOSans、CSS 变量齐全、Tailwind @theme utility class（bg-primary/rounded-xl/shadow-modal）均生效
+
+---
+
+## 用户决策记录（Phase 4 新增）
+
+- 英文字体使用 Google Sans，中文字体使用 OPPOSans
+- Emoji 绝对禁止用作 icon，统一使用 Phosphor Icons（phosphoricons.com）
+
+---
+
+## Phase 5 详细进度（✅ 全部完成）
+
+审查：待 @momus 审查
+
+### 新建文件
+- Step 5.1 ✅ client/src/vite-env.d.ts — Vite 类型声明（解决 import.meta.env TS 报错）
+- Step 5.2 ✅ client/src/lib/supabase.ts — Supabase 客户端实例（VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY）
+- Step 5.3 ✅ client/src/hooks/useAuth.ts — useAuth hook（user/loading/error，signUp/signIn/signOut）
+- Step 5.4 ✅ client/src/hooks/useApiKey.ts — useApiKey hook（sessionStorage 管理，sk- 前缀校验）
+- Step 5.5a ✅ client/src/components/shared/AuthPage.tsx — 邮箱登录/注册页（全屏居中卡片）
+- Step 5.5b ✅ client/src/components/shared/BYOKModal.tsx — API Key 输入弹窗（Opencode sk- 格式校验）
+- Step 5.5c ✅ client/src/App.tsx — auth gate（未登录→AuthPage，已登录→主视图+BYOKModal）
+- Step 5.env ✅ client/.env — VITE_SUPABASE_URL 和 VITE_SUPABASE_ANON_KEY
+
+### Bug 修复
+- signUp 返回值判断：修复注册成功/失败消息同时显示的问题
+- 已注册邮箱检测：检测 Supabase identities 为空，提示"该邮箱已注册，请直接登录"
+- 手机号 Tab 移除：Supabase 未启用手机号注册，仅保留邮箱登录
+
+### 文档更新（API Key 格式 sk-ant- → sk-，Opencode API Key）
+- CodeTown_PRD_v6_5.md ✅
+- TECH_STACK_v1_0_revised.md ✅
+- FRONTEND_GUIDELINES_v1_0_revised.md ✅
+- BACKEND_STRUCTURE_v1_0_revised.md ✅
+- IMPLEMENTATION_PLAN_v1_0_revised.md ✅
+- APP_FLOW_v1_2_revised.md ✅
+
+### 验收状态
+- [x] 未登录用户打开应用 → 显示 AuthPage
+- [x] 邮箱表单校验正确（格式+密码>=8位）
+- [x] 注册/登录调用 Supabase Auth，成功后进入主视图
+- [x] Token 由 Supabase SDK 管理（localStorage）
+- [x] 刷新页面后自动恢复登录状态
+- [x] BYOKModal 输入 API Key，sk- 前缀校验
+- [x] Key 存入 sessionStorage（ct_api_key），不存入 localStorage
+- [x] 关闭标签页后 Key 清除
+- [x] npm run build 零 TS 错误
+
+---
+
+## 用户决策记录（Phase 5 新增）
+
+- 认证方式仅保留邮箱登录（Supabase 未启用手机号注册）
+- API Key 使用 Opencode 格式（sk-XXXX），非 Anthropic 官方格式（sk-ant-）
+- 6 份文档全部同步更新 API Key 格式说明
+
+---
+
+## Phase 6 详细进度（✅ 全部完成）
+
+审查：待 @momus 审查
+
+- Step 6.1 ✅ 地图背景：bg.svg + 4 栋建筑 SVG（l1-l4 各 color/gray 版本）放入 client/public/assets/map/
+- Step 6.2 ✅ useTownState hook：管理 4 栋建筑状态（locked/unlocked/completed）
+- Step 6.3 ✅ TownMap 组件：地图容器（cover 填充）+ 建筑卡片定位
+- Step 6.4 ✅ BuildingCard 组件：灰色/彩色 SVG 切换、锁定覆层、完成徽章
+- Step 6.5 ✅ TopNav 组件：顶部导航栏
+- Step 6.6 ✅ DevPositionMode 组件：开发调位模式（按 D 进入，拖拽移动、滚轮缩放）
+- Step 6.7 ✅ 建筑位置定稿功能：DevPositionMode 增加"定稿保存"按钮，位置存入 localStorage 持久化，刷新不丢失；"重置默认"按钮恢复代码默认值
+- Step 6.8 ✅ 地图容器 cover 修复：用 ResizeObserver 计算精确 cover 尺寸，替代 CSS minWidth+minHeight+aspectRatio 组合（后者在窄高窗口会打破宽高比导致建筑位置漂移）
+- Step 6.9 ✅ 建筑点击交互：locked → toast「尚未解锁」，unlocked → BYOK 检查后跳转 /level/:n/desk，completed → 弹出「查看项目/重新建造」菜单
+- Step 6.10 ✅ 路由：wouter Switch + /level/:n/desk 占位页（LevelDeskPlaceholder），locked 路由守卫自动重定向
+
+### 用户决策记录（Phase 6）
+- 建筑 SVG 位置/大小由用户通过 DevPositionMode 手动拖拽调整并定稿保存，不由代码硬编码（已写入 CLAUDE.md 第 9 条）
+
+---
+
+## Phase 7 详细进度（🔧 进行中）
+
+审查：待完成
+
+### 已完成
+
+**核心功能：**
+- [x] 从地图点击已解锁建筑 → 进入设计桌（替换 LevelDeskPlaceholder）
+- [x] 9 个文件夹 SVG 图标显示在桌面左侧
+- [x] 文件夹按关卡渐进解锁（L1: 前4个, L3: +4个, L4: +1个）
+- [x] 中栏蓝图显示卡槽（必填/可选/锁定三种状态）
+- [x] 9 种组件卡片各有独立表单字段，数据存入 ProjectSpec state
+- [x] 所有必填卡槽填写后"制定工作计划"按钮启用
+- [x] Tab 切换正常（设计桌绿色激活，工地白色禁用）
+- [x] npm run build 零 TS 错误
+
+**布局：**
+- [x] 全桌面布局：木纹背景 + 所有元素绝对定位
+- [x] 装饰元素：台灯、盆栽
+- [x] "制定工作计划"按钮在桌面右下角
+
+**D 模式调位系统：**
+- [x] 按 D 键进入/退出编辑模式
+- [x] 所有 SVG 元素可拖拽移动 + 右下角手柄缩放
+- [x] 定稿保存 / 重置默认
+- [x] 文字标签与文件夹图标已解绑，可独立定位
+- [x] 编辑框通过测量实际 DOM 元素边界定位（data-ws-id）
+- [x] 标签元素无缩放手柄（仅移动）
+
+**交互逻辑：**
+- [x] 点击文字标签 → 对应卡片填入/移出图纸卡槽
+- [x] 锁定文件夹点击 → toast 提示解锁关卡
+- [x] 填满必填卡槽 → 按钮变蓝启用
+- [x] 点击"制定工作计划" → stub 加载 → 变为"开始建造"
+- [x] 点击"开始建造" → 检查 API Key → 无则弹 BYOK Modal
+
+**卡片组件（全部完成）：**
+- [x] BriefCard（委托单）
+- [x] StyleCard（装修方案）
+- [x] RequirementsCard（需求清单）
+- [x] AgentTeamCard（工匠团队）
+- [x] SkillsCard（技能包）
+- [x] RulesCard（规则系统）
+- [x] FlowControlCard（流程控制）
+- [x] PlugCard（Plug）
+- [x] LibraryCard（图书馆）
+
+### 已解决问题
+
+#### 问题 1：文字与文件夹编组拖动 — 不需要修复
+**描述：** 文字标签（label-*）和文件夹图标（folder-*）是完全独立的元素，D 模式下需分别拖动。
+**结论：** 用户手动排版完成，位置已固定写入代码默认值，无需编组功能。
+
+#### 问题 2：文件夹 D 模式编辑框不贴合图标边缘 — ✅ 已修复
+**描述：** 文件夹 SVG 文件内部 viewBox 包含大量透明空白区域，导致编辑框比实际可见图标大很多。
+**修复方案：** 编写 Node.js 脚本（scripts/trim-svgs.mjs）解析所有 folder SVG 的 path 数据，计算实际内容边界框，自动裁剪 viewBox。9 个 SVG 空白面积缩减 34%~76%。
+
+### 其他变更
+- plant 装饰元素已从设计桌永久移除（DEFAULT_ELEMENTS + 渲染代码）
+- 所有元素位置由用户手动排版后固定写入代码默认值
+
+### 用户决策记录（Phase 7）
+- 交互改为点击文字触发（非点击图标），因图标点击区域不精确
+- 文字标签与文件夹图标解绑，独立定位
+- 开发服务器固定端口 5180（已写入 CLAUDE.md 第 10 条）
+- D 模式编辑框必须紧贴主体（已写入 CLAUDE.md 第 12 条）
+- 地图建筑定稿位置：L1(3.2%, 34.5%, 25%), L2(25.9%, 16.0%, 22%), L3(40.2%, 26.7%, 42%), L4(67.2%, 26.5%, 31%)
+
+---
+
+## Phase 10 详细进度（✅ 全部完成）
+
+审查：待 @momus 审查
+
+### 前置步骤
+- Step 10.0 ✅ shared/src/types.ts 更新：Task（name→title, +dependsOn/isCheckpoint/isRetry）、TaskDAG（去掉 edges）、新增 UserPublic、build_complete 加 updatedUser
+
+### 新建文件
+- Step 10.1 ✅ server/src/index.ts — Express 5 入口重写（dotenv、CORS 5180、json limit 1mb、createServer、health 端点、404、全局错误处理）
+- Step 10.2 ✅ server/src/lib/supabase.ts — Supabase 后端客户端（Proxy 惰性初始化，SERVICE_ROLE_KEY）
+- Step 10.3 ✅ server/src/middleware/auth.ts — Supabase JWT 验证中间件（supabase.auth.getUser）
+- Step 10.4 ✅ server/src/routes/auth.ts — 认证路由（GET /api/user/me、POST /api/auth/byok、POST /api/auth/refresh）
+- Step 10.5 ✅ server/src/utils/nanoid.ts — ID 生成工具（从参考代码复制）
+- Step 10.5 ✅ server/src/utils/stylePresets.ts — 样式预设描述（从参考代码复制）
+- Step 10.5 ✅ server/src/utils/libraryContext.ts — 图书馆上下文拼接（从参考代码复制）
+- Step 10.5 ✅ server/src/utils/modelConfig.ts — AI 模型配置（从参考代码复制）
+
+### 其他变更
+- .env ✅ CORS_ORIGIN 改为 http://localhost:5180
+
+### 验收状态
+- [x] npm run build -w server 零 TS 错误
+- [x] npm run dev -w server 启动正常
+- [x] curl localhost:3001/health → {"status":"ok"}
+- [x] CORS 允许 localhost:5180
+- [x] requireAuth 中间件用 supabase.auth.getUser() 验证（非自建 JWT）
+- [x] 前端认证（useAuth.ts 直连 Supabase Auth）不受影响
+- [x] 前端 UI（SVG/地图/工作桌）零改动
+
+### 用户决策记录（Phase 10）
+- 认证方案：前端保持直连 Supabase Auth，后端只验证 Supabase JWT token（不用参考代码的自建 JWT）
+- Task 类型：改成 dependsOn 风格（与参考代码一致）
+- AI API：用 OpenCode Responses API
+- 不需要 register/login 后端端点（前端直连 Supabase Auth）
+- 后端端口 3001，前端端口 5180，互不冲突
+
+---
+
+## Phase 11 详细进度（✅ 全部完成）
+
+审查：待 @momus 审查
+
+### 修改文件
+- Step 11.1 ✅ server/src/utils/modelConfig.ts — 更新模型配置（model→claude-sonnet-4-6，apiEndpoint→new.codeforvibe.com/v1/messages，新增 maxTokens/keyPrefix）
+- Step 11.1 ✅ server/src/index.ts — 注册 projectRoutes
+
+### 新建文件
+- Step 11.2 ✅ server/src/services/MetaPlanner.ts — 规范化 ProjectSpec（需求按 type 排序、技能按 target_agent 分组、规则按 trigger_type 排序）
+- Step 11.2 ✅ server/src/routes/projects.ts — POST /api/meta-plan（requireAuth + X-API-Key 校验）
+- Step 11.3 ✅ server/src/services/SkillInjector.ts — 7 层严格顺序组装 Agent System Prompt（role→project_based_prompt→rules→skills→library→flow_control→task）
+- Step 11.4 ✅ server/src/services/AgentRunner.ts — 封装单次 Claude API 流式调用（Anthropic SDK stream，onChunk + onMirrorChunk 回调）
+- Step 11.5 ✅ server/src/services/Orchestrator.ts — 构建管线调度器（规划→DAG拓扑执行→CSP注入→写DB→build_complete）
+- Step 11.6 ✅ server/src/services/MirrorService.ts — Mirror 面板气泡生命周期管理（startBubble/appendChunk/completeBubble）
+
+### 验收状态
+- [x] npm run build -w server 零 TS 错误
+- [x] Agent 身份使用"计划者/建造者/测试者/审核者"，不使用昵称
+- [x] SkillInjector 7 层顺序严格不可调换
+- [x] AgentRunner 永远不 log apiKey
+- [x] Orchestrator 并发构建限制（Map<userId>）
+- [x] shareSlug 碰撞重试最多 3 次
+- [x] output HTML 注入 CSP meta 标签
+- [x] parseDag 支持 markdown 代码块包裹的 JSON
+
+### 用户决策记录（Phase 11）
+- Agent 身份不使用昵称（小策/小匠等），直接用"计划者/建造者/测试者/审核者"
+- Task DAG 前端展示方式：步骤清单（非流程图），同时展示在计划者卡片和思索面板中
+- DAG 数据通过 WebSocket plan_complete 消息推送，前端负责渲染

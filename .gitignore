@@ -1,0 +1,38 @@
+# 依赖
+node_modules/
+.pnp
+.pnp.js
+
+# 构建产物
+dist/
+build/
+client/dist/
+server/dist/
+
+# 环境变量（绝不提交真实密钥）
+.env
+.env.local
+.env.*.local
+*.env.local
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 日志
+*.log
+npm-debug.log*
+
+# 临时文件
+*.tmp
+.cache/
+
+# Claude / OpenCode 本地配置
+.claude/
+.opencode/
