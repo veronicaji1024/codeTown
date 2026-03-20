@@ -1,10 +1,17 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useLocation } from 'wouter'
 import AgentCard from './AgentCard'
 import ThinkingPanel from './ThinkingPanel'
 import ConstructionDevMode, { CS_POSITIONS_KEY } from './ConstructionDevMode'
 import type { ElementPosition } from './ConstructionDevMode'
-import { AGENTS, THINKING_MESSAGES } from './mockData'
+import { AGENT_TEMPLATES } from './mockData'
+import type { AgentData, AgentStatus } from './mockData'
+import type { Task } from '@codetown/shared'
+import { useBuildStore } from '@/store/buildStore'
+import { wsService } from '@/services/websocket'
+import { supabase } from '@/lib/supabase'
+import { toast } from '@/hooks/use-toast'
+import type { ProjectSpec } from '@codetown/shared'
 
 import RevealMoment from './RevealMoment'
 import tabDeskIcon from '@/assets/construction/icons/tab-desk.svg'
@@ -20,11 +27,21 @@ const DEFAULT_ELEMENTS: ElementPosition[] = [
   { id: 'thinking-panel',  left: '60%',  top: '0%',   width: '40%' },
 ]
 
+function agentBaseType(agentType: string): string {
+  if (agentType.startsWith('builder')) return 'builder'
+  return agentType
+}
+
+function dagSummary(tasks: Task[]): string {
+  return tasks.map((t, i) => `${i + 1}. ${t.title}`).join('\n')
+}
+
 export default function ConstructionSiteView({ level }: ConstructionSiteViewProps) {
   const [, navigate] = useLocation()
   const containerRef = useRef<HTMLDivElement>(null)
   const [devMode, setDevMode] = useState(false)
-  const [showReveal, setShowReveal] = useState(false)
+  const [accessToken, setAccessToken] = useState<string | null>(null)
+  const buildStartedRef = useRef(false)
   const [elements, setElements] = useState<ElementPosition[]>(() => {
     try {
       const saved = localStorage.getItem(CS_POSITIONS_KEY)
@@ -41,6 +58,112 @@ export default function ConstructionSiteView({ level }: ConstructionSiteViewProp
     return DEFAULT_ELEMENTS
   })
 
+  // Get Supabase access token
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setAccessToken(session?.access_token ?? null)
+    })
+  }, [])
+
+  // Connect to WS via buildStore
+  const build = useBuildStore(accessToken)
+
+  // 当 WS 重连导致 status 重置为 idle 时，允许 auto-start 再次触发
+  useEffect(() => {
+    if (build.status === 'idle') {
+      buildStartedRef.current = false
+    }
+  }, [build.status])
+
+  // Auto-start build once WS is connected and we have spec + apiKey
+  useEffect(() => {
+    if (buildStartedRef.current) return
+    if (!build.wsReady) return
+
+    const specJson = sessionStorage.getItem('ct_build_spec')
+    const apiKey = sessionStorage.getItem('ct_api_key')
+
+    if (!specJson || !apiKey) {
+      toast({ title: '缺少构建参数', description: '请从设计桌开始构建流程' })
+      return
+    }
+
+    try {
+      const spec = JSON.parse(specJson) as ProjectSpec
+      buildStartedRef.current = true
+      build.startBuild(spec, apiKey)
+    } catch {
+      toast({ title: '规格数据错误', description: '无法解析项目规格' })
+    }
+  }, [build.wsReady, build.startBuild])
+
+  // 重试：断开旧连接 → 重置状态 → 重新获取 token 触发重连
+  const handleRetry = () => {
+    buildStartedRef.current = false
+    build.reset()
+    wsService.disconnect() // 显式断开，让 connect() 知道需要新建连接
+    setAccessToken(null)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setAccessToken(session?.access_token ?? null)
+    })
+  }
+
+  // Dynamically generate agent cards from DAG tasks
+  const agents: AgentData[] = useMemo(() => {
+    const plannerTpl = AGENT_TEMPLATES.planner
+
+    // Phase 1: idle/planning → only show planner card
+    const KNOWLEDGE_PLACEHOLDER = '正在生成知识中…'
+
+    if (build.status === 'idle' || build.status === 'planning') {
+      const plannerStatus: AgentStatus = build.status === 'planning' ? 'running' : 'pending'
+      return [{
+        id: 'planner',
+        name: plannerTpl.name,
+        role: plannerTpl.role,
+        description: build.status === 'planning' ? '正在规划施工方案…' : '等待开始',
+        status: plannerStatus,
+        avatar: plannerTpl.avatar,
+        thinkingIcon: plannerTpl.thinkingIcon,
+        cardBg: plannerTpl.cardBg,
+        teachingMoment: plannerStatus === 'running' ? KNOWLEDGE_PLACEHOLDER : undefined,
+      }]
+    }
+
+    // Phase 2: building/complete/failed → planner done + task cards from DAG
+    const plannerCard: AgentData = {
+      id: 'planner',
+      name: plannerTpl.name,
+      role: plannerTpl.role,
+      description: dagSummary(build.tasks),
+      status: 'done',
+      avatar: plannerTpl.avatar,
+      thinkingIcon: plannerTpl.thinkingIcon,
+      cardBg: plannerTpl.cardBg,
+      teachingMoment: plannerTpl.teachingMoment,
+    }
+
+    const taskCards: AgentData[] = build.tasks.map(task => {
+      const baseType = agentBaseType(task.agentType)
+      const tpl = AGENT_TEMPLATES[baseType] || AGENT_TEMPLATES.builder
+      return {
+        id: task.id,
+        name: tpl.name,
+        role: tpl.role,
+        description: task.title,
+        status: task.status as AgentStatus,
+        avatar: tpl.avatar,
+        thinkingIcon: tpl.thinkingIcon,
+        cardBg: tpl.cardBg,
+        teachingMoment: task.status === 'done' ? tpl.teachingMoment
+          : task.status === 'running' ? KNOWLEDGE_PLACEHOLDER
+          : undefined,
+      }
+    })
+
+    return [plannerCard, ...taskCards]
+  }, [build.status, build.tasks])
+
   // D key toggle (dev only)
   useEffect(() => {
     if (!import.meta.env.DEV) return
@@ -52,10 +175,6 @@ export default function ConstructionSiteView({ level }: ConstructionSiteViewProp
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
   }, [])
-
-  const getPos = useCallback((id: string) => {
-    return elements.find(e => e.id === id) ?? DEFAULT_ELEMENTS.find(e => e.id === id)!
-  }, [elements])
 
   return (
     <div
@@ -123,7 +242,91 @@ export default function ConstructionSiteView({ level }: ConstructionSiteViewProp
           </div>
         </div>
 
-        {/* Agent cards grid */}
+        {/* 连接中状态 */}
+        {build.status === 'idle' && !build.wsReady && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flex: 1,
+            gap: 12,
+          }}>
+            <div style={{
+              width: 32, height: 32,
+              border: '3px solid #ccc',
+              borderTopColor: '#22c55e',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+            }} />
+            <span style={{ fontSize: 15, color: '#666' }}>正在连接服务器…</span>
+            <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+          </div>
+        )}
+
+        {/* 错误面板 */}
+        {build.status === 'failed' && (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flex: 1,
+            gap: 16,
+          }}>
+            <div style={{
+              backgroundColor: '#FEF2F2',
+              border: '1px solid #FECACA',
+              borderRadius: 12,
+              padding: '24px 32px',
+              maxWidth: 420,
+              textAlign: 'center',
+            }}>
+              <div style={{ fontSize: 36, marginBottom: 12 }}>&#9888;</div>
+              <div style={{ fontSize: 16, fontWeight: 600, color: '#991B1B', marginBottom: 8 }}>
+                构建失败
+              </div>
+              <div style={{ fontSize: 14, color: '#7F1D1D', marginBottom: 20, lineHeight: 1.5 }}>
+                {build.errorMessage || '发生未知错误'}
+              </div>
+              <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+                <button
+                  onClick={handleRetry}
+                  style={{
+                    padding: '8px 20px',
+                    borderRadius: 8,
+                    backgroundColor: '#22c55e',
+                    color: '#fff',
+                    fontWeight: 600,
+                    fontSize: 14,
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  重试
+                </button>
+                <button
+                  onClick={() => level && navigate(`/level/${level}/desk`)}
+                  style={{
+                    padding: '8px 20px',
+                    borderRadius: 8,
+                    backgroundColor: '#fff',
+                    color: '#666',
+                    fontWeight: 600,
+                    fontSize: 14,
+                    border: '1px solid #ddd',
+                    cursor: level ? 'pointer' : 'default',
+                  }}
+                >
+                  返回设计桌
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Agent cards grid — 仅在非错误状态时显示 */}
+        {build.status !== 'failed' && (build.status !== 'idle' || build.wsReady) && (
         <div
           data-ws-id="agent-grid"
           style={{
@@ -133,7 +336,7 @@ export default function ConstructionSiteView({ level }: ConstructionSiteViewProp
             alignContent: 'flex-start',
           }}
         >
-          {AGENTS.map(agent => (
+          {agents.map(agent => (
             <div
               key={agent.id}
               style={{
@@ -145,42 +348,22 @@ export default function ConstructionSiteView({ level }: ConstructionSiteViewProp
             </div>
           ))}
         </div>
+        )}
       </div>
 
       {/* Right side — thinking panel */}
       <div style={{ flex: '0 0 40%' }}>
-        <ThinkingPanel messages={THINKING_MESSAGES} />
+        <ThinkingPanel messages={build.mirrorBubbles} />
       </div>
 
-      {/* DEV: mock trigger for reveal */}
-      {import.meta.env.DEV && !showReveal && (
-        <button
-          onClick={() => setShowReveal(true)}
-          style={{
-            position: 'fixed',
-            bottom: 20,
-            right: 20,
-            zIndex: 900,
-            padding: '8px 16px',
-            fontSize: 13,
-            fontWeight: 600,
-            color: '#fff',
-            backgroundColor: '#E5594F',
-            border: 'none',
-            borderRadius: 8,
-            cursor: 'pointer',
-            fontFamily: 'inherit',
-          }}
-        >
-          模拟构建完成
-        </button>
-      )}
-
       {/* Reveal Moment */}
-      {showReveal && (
+      {build.status === 'complete' && build.outputHtml && (
         <RevealMoment
-          outputHtml={`<!DOCTYPE html><html><head><style>body{margin:0;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#f0f9ff;}h1{color:#3385FF;}</style></head><body><h1>Hello CodeTown!</h1></body></html>`}
-          onBackToTown={() => navigate('/')}
+          outputHtml={build.outputHtml}
+          onBackToTown={() => {
+            build.reset()
+            navigate('/')
+          }}
         />
       )}
 

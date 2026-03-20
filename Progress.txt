@@ -30,14 +30,14 @@ URL: https://orfdkvinlovtigkaueym.supabase.co
 [✅] Phase 4  — 前端基础设施
 [✅] Phase 5  — 前端：认证流程
 [✅] Phase 6  — 前端：小镇地图视图
-[ ] Phase 7  — 前端：设计桌 (Workspace)
-[ ] Phase 8  — 前端：工地视图 (Construction)
+[✅] Phase 7  — 前端：设计桌 (Workspace)
+[✅] Phase 8  — 前端：工地视图 (Construction)
 [ ] Phase 9  — 前端：WebSocket 客户端
 [✅] Phase 10 — 后端基础设施
 [✅] Phase 11 — 后端：AI 服务层
-[ ] Phase 12 — 后端：WebSocket 服务
-[ ] Phase 13 — 后端：Plug 与魔法连接
-[ ] Phase 14 — 后端：其余 REST API 路由
+[✅] Phase 12 — 后端：WebSocket 服务
+[✅] Phase 13 — 后端：Plug 与魔法连接
+[✅] Phase 14 — 后端：其余 REST API 路由
 [ ] Phase 15 — 集成联调与部署
 
 ---
@@ -176,7 +176,7 @@ URL: https://orfdkvinlovtigkaueym.supabase.co
 
 ---
 
-## Phase 7 详细进度（🔧 进行中）
+## Phase 7 详细进度（✅ 全部完成）
 
 审查：待完成
 
@@ -314,3 +314,131 @@ URL: https://orfdkvinlovtigkaueym.supabase.co
 - Agent 身份不使用昵称（小策/小匠等），直接用"计划者/建造者/测试者/审核者"
 - Task DAG 前端展示方式：步骤清单（非流程图），同时展示在计划者卡片和思索面板中
 - DAG 数据通过 WebSocket plan_complete 消息推送，前端负责渲染
+
+---
+
+## Phase 8 详细进度（✅ 全部完成）
+
+审查：待 @momus 审查
+
+### Phase 8.1（之前已完成）
+- [x] AgentCard 组件：4 个 Agent 卡片 + 3D 翻转动画
+- [x] ThinkingPanel 组件：思索面板气泡消息
+
+### Phase 8.2 — AgentCard 知识卡片补全 ✅
+- [x] 建造者 teachingMoment：代码生成 (Code Generation)
+- [x] 测试者 teachingMoment：测试验证 (Testing)
+- [x] 审核者 teachingMoment：代码审查 (Code Review)
+- [x] 4 个 AgentCard 均可翻转查看知识卡片
+
+### Phase 8.3 — ThinkingPanel 多色气泡 + 代码片段 + 完成标记 ✅
+- [x] ThinkingMessageData 接口新增 color 字段
+- [x] 气泡按 Agent 区分颜色：计划者 #EF7267、建造者 #3385FF、测试者 #4CAF50、审核者 #FF9800
+- [x] 反引号包裹的内联代码渲染为 monospace 样式（半透明深色背景、圆角 4px）
+- [x] [完成] 前缀渲染为绿色小标签
+- [x] 丰富 mock 消息内容（含代码片段和完成标记示例）
+- [x] npm run build 零 TS 错误
+
+### 改动文件（Phase 8.2 + 8.3）
+- client/src/components/construction/mockData.ts
+- client/src/components/construction/ThinkingMessage.tsx
+- client/src/components/construction/ThinkingPanel.tsx
+
+---
+
+## Phase 12 详细进度（✅ 全部完成）
+
+审查：待 @momus 审查
+
+### 新建文件
+- Step 12.1 ✅ server/src/ws/wsHandler.ts — WebSocket 服务主文件（连接认证、状态管理、消息处理、Orchestrator 回调对接、断开清理）
+
+### 修改文件
+- Step 12.2 ✅ server/src/index.ts — 导入 setupWebSocket 并替换 TODO Phase 12 注释
+
+### 功能实现
+- **连接认证**：从 `?token=` 提取 Supabase access token，用 `supabase.auth.getUser()` 验证，缺失→close(4001, missing_token)，无效→close(4001, invalid_token)
+- **连接唯一性**：`Map<userId, ConnectionState>`，同用户新连接到达时关闭旧连接
+- **消息处理**：`start_build`→调用 orchestrate()，`checkpoint_response`→resolve pending Promise，`stop_build`→设置 stopped=true
+- **Orchestrator 回调**：send（推送 WsServerMessage）、waitForCheckpoint（Promise 阻塞等待用户确认）、isStopped（检查中断标志）
+- **断开清理**：reject 所有 pending checkpoint resolver、从 Map 移除用户、设 stopped=true
+- **安全**：apiKey 不出现在任何日志中
+
+### 验收状态
+- [x] WebSocket 服务挂载在 `/ws` 路径
+- [x] token 验证正确（缺失/无效 → 4001 关闭）
+- [x] 同用户多连接：旧连接被关闭
+- [x] `start_build` 正确调用 Orchestrator 并推送消息流
+- [x] `checkpoint_response` 正确 resolve 等待中的 Promise
+- [x] `stop_build` 正确中断构建
+- [x] 断开连接时正确清理状态
+- [x] apiKey 不出现在任何日志中
+- [x] npm run build -w server 零 TS 错误
+- [x] wscat 测试：无 token → close(4001, missing_token) ✓
+- [x] wscat 测试：无效 token → close(4001, invalid_token) ✓
+
+---
+
+## Phase 13 详细进度（✅ 全部完成）
+
+审查：待 @momus 审查
+
+### 新建文件
+- Step 13.1 ✅ server/src/services/MagicConnector.ts — 魔法连接分类器（关键词白名单）+ 三路 API 调用（天气/翻译/新闻）
+- Step 13.2 ✅ server/src/routes/plug.ts — Plug 代理路由（POST unsplash/mapbox/magic，均需 requireAuth）
+- Step 13.3 ✅ server/src/services/LibraryExtractor.ts — 文本提取（.txt/.md/.doc/.docx，mammoth）
+- Step 13.3 ✅ server/src/routes/library.ts — 图书馆上传端点（multer 500KB + Supabase Storage）
+
+### 修改文件
+- Step 13.2 ✅ server/src/index.ts — 注册 plugRoutes 和 libraryRoutes
+
+### 验收状态
+- [x] npm run build -w server 零 TS 错误
+- [x] classifyByKeyword 关键词白名单分类（不消耗 Claude Token）
+- [x] 天气：高德两步（地理编码 → 天气预报）
+- [x] 翻译：百度翻译（MD5 签名）
+- [x] 新闻：聚合数据（只返回标题，不返回原文）
+- [x] Unsplash/Mapbox/Magic 三个代理端点均有输入校验和错误处理
+- [x] 图书馆上传：multer 文件过滤 + mammoth docx 提取 + Supabase Storage
+- [x] 所有平台 Key 仅存于后端 .env，不暴露到前端
+
+### 后续待办（外部 API Key 注册）
+- [ ] 高德地图 AMAP_KEY — https://lbs.amap.com/
+- [ ] 百度翻译 BAIDU_TRANSLATE_APPID + SECRET — https://fanyi-api.baidu.com/
+- [ ] 聚合数据 JUHE_NEWS_KEY — https://www.juhe.cn/docs/api/id/235
+- [ ] Unsplash UNSPLASH_ACCESS_KEY — https://unsplash.com/developers
+- [ ] Mapbox MAPBOX_ACCESS_TOKEN — https://account.mapbox.com/
+> 以上 5 个外部 API 各需单独注册申请 key，填入根目录 .env 后即可使用。代码已就绪。
+
+### 用户决策记录（Phase 13）
+- 外部 API Key 暂不注册，代码先就绪，后续有需要再逐个申请
+
+---
+
+## Phase 14 详细进度（✅ 全部完成）
+
+审查：待 @momus 审查
+
+### 批次 A — 项目 + 用户路由
+- Step 14.1 ✅ server/src/routes/projects.ts — 扩展：GET /api/projects（用户项目列表）、GET /api/projects/:id（项目详情，owner only）、GET /api/p/:slug（公开分享页，无需认证）
+- Step 14.1b ✅ server/src/routes/users.ts — 新建：GET /api/town/:username（公开小镇页，无需认证）
+- ✅ server/src/index.ts — 注册 usersRoutes
+
+### 批次 B — 草稿 + 技能/规则路由
+- Step 14.2 ✅ server/src/routes/drafts.ts — 新建：GET/PUT/DELETE /api/drafts/:level（草稿 CRUD，upsert on user_id+level）
+- Step 14.3 ✅ server/src/routes/skills.ts — 新建：GET/POST /api/skills + GET/POST /api/rules（内置+用户自定义，同一文件）
+- ✅ server/src/index.ts — 注册 draftsRoutes + skillsRoutes
+
+### 验收状态
+- [x] npm run build -w server 零 TS 错误
+- [x] GET /api/projects 返回当前用户项目列表（需认证）
+- [x] GET /api/projects/:id 仅返回 owner 的项目
+- [x] GET /api/p/:slug 公开访问，返回 outputHtml + projectName + authorName
+- [x] GET /api/town/:username 公开访问，返回 displayName + townState
+- [x] PUT /api/drafts/:level upsert 草稿（UNIQUE user_id+level）
+- [x] DELETE /api/drafts/:level 删除草稿
+- [x] GET /api/skills 返回内置(is_builtin=true) + 用户自定义技能
+- [x] POST /api/skills 创建用户自定义技能
+- [x] GET /api/rules / POST /api/rules 同理
+- [x] 所有需认证端点使用 requireAuth 中间件
+- [x] 公开端点（p/:slug, town/:username）无需认证

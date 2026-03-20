@@ -2,6 +2,14 @@ import type { AgentType, ProjectSpec } from '@codetown/shared'
 import { describeVisualPreset } from '../utils/stylePresets'
 import { buildLibraryContext } from '../utils/libraryContext'
 
+// 按关卡等级返回可用 agentType 列表
+function getAvailableAgentTypes(level: number): string {
+  const types = ['builder_structure', 'builder_style', 'builder_logic']
+  if (level >= 2) types.push('tester')
+  if (level >= 3) types.push('reviewer', 'builder_skill')
+  return types.join(', ')
+}
+
 // Agent 基础身份描述（不使用昵称）
 const AGENT_ROLES: Record<string, string> = {
   planner: `你是"计划者"，一位专业的项目规划师。
@@ -9,7 +17,7 @@ const AGENT_ROLES: Record<string, string> = {
 每个任务必须包含 id、title、dependsOn（依赖的任务 id 数组）、agentType。
 你必须以纯 JSON 格式输出 TaskDAG，不要包含任何其他文字。
 JSON 格式：{ "tasks": [ { "id": "t1", "title": "...", "dependsOn": [], "agentType": "builder_structure" }, ... ] }
-可用的 agentType: builder_structure, builder_style, builder_logic, builder_skill, tester, reviewer。
+可用的 agentType: __AVAILABLE_AGENT_TYPES__。
 合理安排依赖关系：结构先于样式和逻辑，测试依赖所有构建任务，审核在最后。`,
 
   builder_structure: `你是"建造者（结构）"，一位专业的前端开发者。
@@ -65,8 +73,14 @@ export function buildSystemPrompt(
 
   // [1] role
   const baseRole = agentType.startsWith('builder_') ? agentType : agentType
-  const rolePrompt = AGENT_ROLES[baseRole]
-  if (rolePrompt) sections.push(rolePrompt)
+  let rolePrompt = AGENT_ROLES[baseRole]
+  if (rolePrompt) {
+    // Planner: 动态注入当前关卡可用的 agentType
+    if (agentType === 'planner') {
+      rolePrompt = rolePrompt.replace('__AVAILABLE_AGENT_TYPES__', getAvailableAgentTypes(spec.level))
+    }
+    sections.push(rolePrompt)
+  }
 
   // 视觉描述（所有 builder 类型都需要）
   if (agentType.startsWith('builder_')) {

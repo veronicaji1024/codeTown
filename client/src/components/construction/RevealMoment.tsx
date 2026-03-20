@@ -28,7 +28,7 @@ export default function RevealMoment({ outputHtml, onBackToTown }: RevealMomentP
           style={{
             width: '70vw',
             height: '70vh',
-            border: '4px solid #E5594F',
+            border: 'none',
             borderRadius: 16,
             display: 'flex',
             alignItems: 'center',
@@ -43,7 +43,7 @@ export default function RevealMoment({ outputHtml, onBackToTown }: RevealMomentP
               fontSize: 24,
               fontWeight: 700,
               color: '#fff',
-              backgroundColor: '#E5594F',
+              backgroundColor: '#FF9800',
               border: 'none',
               borderRadius: 12,
               cursor: 'pointer',

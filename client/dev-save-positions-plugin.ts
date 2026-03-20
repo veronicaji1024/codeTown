@@ -60,11 +60,11 @@ export default function devSavePositionsPlugin(): Plugin {
 
             // Build replacement array code
             const lines = elements.map(el => {
-              const id = el.id.padEnd(20)
-              const left = `left: '${el.left}',`.padEnd(18)
-              const top = `top: '${el.top}',`.padEnd(18)
-              const width = `width: '${el.width}'`
-              return `  { id: '${id}${left} ${top} ${width} },`
+              const idPart = `id: '${el.id}',`.padEnd(30)
+              const leftPart = `left: '${el.left}',`.padEnd(18)
+              const topPart = `top: '${el.top}',`.padEnd(18)
+              const widthPart = `width: '${el.width}'`
+              return `  { ${idPart} ${leftPart} ${topPart} ${widthPart} },`
             })
 
             // Group with comments matching original style

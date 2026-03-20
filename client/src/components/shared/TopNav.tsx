@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Buildings, SpeakerHigh, SpeakerSlash, Coin } from '@phosphor-icons/react'
+import { Buildings, SpeakerHigh, SpeakerSlash, Coin, SignOut } from '@phosphor-icons/react'
 import type { User } from '@supabase/supabase-js'
 
 interface TopNavProps {
@@ -7,7 +7,7 @@ interface TopNavProps {
   onSignOut: () => void
 }
 
-export default function TopNav({ user }: TopNavProps) {
+export default function TopNav({ user, onSignOut }: TopNavProps) {
   const [soundOn, setSoundOn] = useState(true)
 
   const nickname = user.user_metadata?.nickname
@@ -69,6 +69,19 @@ export default function TopNav({ user }: TopNavProps) {
             ? <SpeakerHigh size={20} weight="regular" />
             : <SpeakerSlash size={20} weight="regular" />
           }
+        </button>
+
+        {/* Sign out */}
+        <button
+          onClick={() => {
+            sessionStorage.removeItem('ct_api_key')
+            onSignOut()
+          }}
+          className="flex cursor-pointer items-center justify-center rounded-md p-1"
+          style={{ color: 'var(--text-secondary)' }}
+          aria-label="退出登录"
+        >
+          <SignOut size={20} weight="regular" />
         </button>
       </div>
     </nav>

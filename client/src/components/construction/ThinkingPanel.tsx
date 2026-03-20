@@ -46,6 +46,7 @@ export default function ThinkingPanel({ messages }: ThinkingPanelProps) {
               agentName={msg.agentName}
               content={msg.content}
               icon={msg.icon}
+              color={msg.color}
               showHeader={showHeader}
             />
           )

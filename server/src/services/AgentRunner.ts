@@ -20,13 +20,19 @@ export async function runAgent({
   onChunk,
   onMirrorChunk,
 }: RunAgentOptions): Promise<string> {
+  const baseURL = MODEL_CONFIG.apiEndpoint.replace(/\/v1\/messages$/, '')
+  console.log('[AgentRunner] baseURL:', baseURL)
+  console.log('[AgentRunner] model:', MODEL_CONFIG.model)
+  console.log('[AgentRunner] apiKey prefix:', apiKey?.slice(0, 6) + '...')
+
   const client = new Anthropic({
     apiKey,
-    baseURL: MODEL_CONFIG.apiEndpoint.replace(/\/messages$/, ''),
+    baseURL,
   })
 
   let fullContent = ''
 
+  console.log('[AgentRunner] Starting stream...')
   const stream = client.messages.stream({
     model: MODEL_CONFIG.model,
     max_tokens: MODEL_CONFIG.maxTokens,

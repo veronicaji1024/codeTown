@@ -41,6 +41,11 @@ export default function TownMap({ user, onSignOut }: TownMapProps) {
     return DEFAULT_POSITIONS
   })
 
+  // Auto-open BYOK modal if no API key on mount
+  useEffect(() => {
+    if (!apiKey) setByokOpen(true)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Compute cover-fit dimensions so the map container always maintains
   // the correct aspect ratio (fixes fullscreen vs non-fullscreen mismatch)
   const mapAreaRef = useRef<HTMLDivElement>(null)

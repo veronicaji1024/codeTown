@@ -21,30 +21,30 @@ interface WorkspaceViewProps {
 // Finalized positions — folders + labels are independent elements
 const DEFAULT_ELEMENTS: ElementPosition[] = [
   // 9 folder icons
-  { id: 'folder-brief',         left: '2.3%',   top: '5.7%',   width: '12%' },
-  { id: 'folder-style',         left: '2.3%',   top: '15.2%',  width: '12%' },
-  { id: 'folder-requirements',  left: '2.3%',   top: '25.4%',  width: '12%' },
-  { id: 'folder-team',          left: '2.4%',   top: '36.3%',  width: '12%' },
-  { id: 'folder-skills',        left: '2.4%',   top: '46.8%',  width: '12%' },
-  { id: 'folder-rules',         left: '2.4%',   top: '56.6%',  width: '12%' },
-  { id: 'folder-flow_control',  left: '2.4%',   top: '65.8%',  width: '12%' },
-  { id: 'folder-plugs',         left: '2.5%',   top: '74.1%',  width: '12%' },
-  { id: 'folder-library',       left: '2.3%',   top: '83.6%',  width: '12%' },
+  { id: 'folder-brief',            left: '2.3%',      top: '5.7%',       width: '9.1%' },
+  { id: 'folder-style',            left: '2.3%',      top: '15.2%',      width: '9.1%' },
+  { id: 'folder-requirements',     left: '2.1%',      top: '24.1%',      width: '9.3%' },
+  { id: 'folder-team',             left: '2.4%',      top: '34.3%',      width: '9.1%' },
+  { id: 'folder-skills',           left: '2.4%',      top: '44.9%',      width: '9.2%' },
+  { id: 'folder-rules',            left: '2.4%',      top: '54.9%',      width: '9.2%' },
+  { id: 'folder-flow_control',     left: '2.4%',      top: '64.6%',      width: '9.2%' },
+  { id: 'folder-plugs',            left: '2.4%',      top: '73.0%',      width: '9.2%' },
+  { id: 'folder-library',          left: '2.4%',      top: '82.0%',      width: '9.1%' },
   // 9 folder labels (independent, can be positioned separately)
-  { id: 'label-brief',          left: '4.6%',   top: '8.4%',   width: '10%' },
-  { id: 'label-style',          left: '3.9%',   top: '18.1%',  width: '10%' },
-  { id: 'label-requirements',   left: '4.1%',   top: '27.8%',  width: '10%' },
-  { id: 'label-team',           left: '4.1%',   top: '39.0%',  width: '10%' },
-  { id: 'label-skills',         left: '4.6%',   top: '49.4%',  width: '10%' },
-  { id: 'label-rules',          left: '4.1%',   top: '59.5%',  width: '10%' },
-  { id: 'label-flow_control',   left: '3.8%',   top: '68.8%',  width: '10%' },
-  { id: 'label-plugs',          left: '5.5%',   top: '76.7%',  width: '10%' },
-  { id: 'label-library',        left: '4.7%',   top: '86.3%',  width: '10%' },
+  { id: 'label-brief',             left: '4.6%',      top: '8.4%',       width: '10%' },
+  { id: 'label-style',             left: '3.9%',      top: '18.1%',      width: '10%' },
+  { id: 'label-requirements',      left: '4.3%',      top: '27.0%',      width: '10%' },
+  { id: 'label-team',              left: '4.2%',      top: '37.5%',      width: '10%' },
+  { id: 'label-skills',            left: '5.0%',      top: '47.9%',      width: '10%' },
+  { id: 'label-rules',             left: '4.4%',      top: '58.3%',      width: '10%' },
+  { id: 'label-flow_control',      left: '4.5%',      top: '67.7%',      width: '10%' },
+  { id: 'label-plugs',             left: '5.5%',      top: '76.0%',      width: '10%' },
+  { id: 'label-library',           left: '5.1%',      top: '85.3%',      width: '10%' },
   // Decorations & layout
-  { id: 'lamp',                 left: '29.1%',  top: '-0.1%',  width: '13.9%' },
-  { id: 'blueprint',            left: '31.8%',  top: '13.9%',  width: '50%' },
-  { id: 'tabs',                 left: '70.7%',  top: '6.7%',   width: '20%' },
-  { id: 'plan-button',          left: '85.6%',  top: '85.0%',  width: '11.0%' },
+  { id: 'lamp',                    left: '29.1%',     top: '-0.1%',      width: '13.9%' },
+  { id: 'blueprint',               left: '31.8%',     top: '13.9%',      width: '50%' },
+  { id: 'tabs',                    left: '71.9%',     top: '6.8%',       width: '20%' },
+  { id: 'plan-button',             left: '85.6%',     top: '85.0%',      width: '11.0%' },
 ]
 
 // Map folder element IDs to ComponentType
@@ -145,6 +145,7 @@ export default function WorkspaceView({ level }: WorkspaceViewProps) {
       setShowBYOK(true)
       return
     }
+    sessionStorage.setItem('ct_build_spec', JSON.stringify(projectSpec.spec))
     navigate(`/level/${level}/site`)
   }
 
@@ -415,7 +416,8 @@ export default function WorkspaceView({ level }: WorkspaceViewProps) {
         onKeySubmit={key => {
           setApiKey(key)
           setShowBYOK(false)
-          console.log('Start build with spec:', projectSpec.spec)
+          sessionStorage.setItem('ct_build_spec', JSON.stringify(projectSpec.spec))
+          navigate(`/level/${level}/site`)
         }}
       />
     </div>

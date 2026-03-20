@@ -172,6 +172,7 @@ export async function orchestrate(
     })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error'
+    console.error('[Orchestrator] Build error:', message, err)
     callbacks.send({ type: 'build_error', message, recoverable: false })
   } finally {
     activeBuilds.delete(userId)

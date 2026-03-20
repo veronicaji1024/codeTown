@@ -42,8 +42,9 @@ export default function AgentCard({ agent }: AgentCardProps) {
     setIsFlipped(prev => !prev)
   }
 
-  // TM pulse: has teachingMoment AND user hasn't flipped yet
-  const showTMPulse = canFlip && !hasSeenTM
+  // TM pulse: only show pulse when done (real content ready) AND user hasn't flipped yet
+  const isPlaceholder = agent.teachingMoment === '正在生成知识中…'
+  const showTMPulse = canFlip && !hasSeenTM && !isPlaceholder
 
   return (
     <div

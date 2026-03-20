@@ -10,6 +10,12 @@ import cors from 'cors'
 import { createServer } from 'node:http'
 import authRoutes from './routes/auth'
 import projectRoutes from './routes/projects'
+import plugRoutes from './routes/plug'
+import libraryRoutes from './routes/library'
+import usersRoutes from './routes/users'
+import draftsRoutes from './routes/drafts'
+import skillsRoutes from './routes/skills'
+import { setupWebSocket } from './ws/wsHandler'
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -28,10 +34,11 @@ app.get('/health', (_req, res) => {
 // 路由
 app.use('/api', authRoutes)
 app.use('/api', projectRoutes)
-
-// TODO Phase 14: buildRoutes, shareRoutes
-// app.use('/api', buildRoutes)
-// app.use('/api', shareRoutes)
+app.use('/api', plugRoutes)
+app.use('/api', libraryRoutes)
+app.use('/api/town', usersRoutes)
+app.use('/api', draftsRoutes)
+app.use('/api', skillsRoutes)
 
 // 404 处理
 app.use((_req, res) => {
@@ -46,7 +53,7 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 
 const server = createServer(app)
 
-// TODO Phase 12: attachWebSocketServer(server)
+setupWebSocket(server)
 
 server.listen(PORT, () => {
   console.log(`CodeTown server running on http://localhost:${PORT}`)
