@@ -165,7 +165,7 @@ codetown/
 
 ## 开发背景
 
-CodeTown 最初作为 Oxford AI Hackathon（2026）参赛项目开发，目标是让从未写过代码的青少年，通过游戏化方式真正体验 AI 辅助编程的全流程。
+CodeTown 最初作为AI Hackathon Tour（2026）参赛项目开发，目标是让从未写过代码的青少年，通过游戏化方式真正体验 AI 辅助编程的全流程。
 
 ---
 
